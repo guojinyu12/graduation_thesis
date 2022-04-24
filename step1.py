@@ -14,11 +14,15 @@ def step1(filename: str, newfilename: str) -> None:
     del wb['Sheet1']  # 删除'Sheet1'表
     # 处理缺失数据
     ws = wb['1']
-    # ws.delete_cols(7) # 删除空行
+
     for row in ws.rows:
-        # 数据格式不一致，年份不一定有颜色
+        # 处理缺失的融化像元数据，数据格式不一致，年份不一定有颜色
         if any(map(lambda x: x.font.color.rgb == 'FFFF0000', row)):
             row[2].value = row[3].value = row[4].value = row[5].value = ''
+        # 处理缺失气温数据
+        for x in row:
+            if x.value == '-':
+                x.value = ''
     wb.save(newfilename)
 
 
