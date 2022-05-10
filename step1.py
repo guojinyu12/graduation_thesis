@@ -10,17 +10,16 @@ def step1(filename: str, newfilename: str) -> None:
     if os.path.exists(newfilename):
         print(f'{newfilename} 已存在。')
         exit(1)
-    wb = xl.load_workbook(filename)
-    del wb['Sheet1']  # 删除'Sheet1'表
+    wb: xl.Workbook = xl.load_workbook(filename)
     # 处理缺失数据
     ws = wb['1']
 
-    for row in ws.rows:
+    for row in ws.iter_rows(max_col=13):
         # 处理缺失的融化像元数据，数据格式不一致，年份不一定有颜色
         if any(map(lambda x: x.font.color.rgb == 'FFFF0000', row)):
             row[2].value = row[3].value = row[4].value = row[5].value = ''
         # 处理缺失气温数据
-        for x in row:
+        for x in row[9:]:
             if x.value == '-':
                 x.value = ''
     wb.save(newfilename)
