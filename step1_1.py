@@ -28,8 +28,8 @@ def step1(filename: str, newfilename: str) -> None:
 if __name__ == '__main__':
     filename = newfilename = None
     if len(sys.argv) == 1:
-        filename = './resources/冻融范围和气温的时间序列.xlsx'
-        newfilename = './resources/data.xlsx'
+        filename = '/home/gjy/code/python3/myworks/resources/冻融范围和气温的时间序列.xlsx'
+        newfilename = '/home/gjy/code/python3/myworks/resources/data.xlsx'
     elif len(sys.argv) == 3:
         filename = sys.argv[1]
         newfilename = sys.argv[2]
