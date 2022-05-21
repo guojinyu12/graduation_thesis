@@ -48,7 +48,7 @@ if __name__ == '__main__':
         t.append((1 - elbow[i] / elbow[i - 1]) * 100)
 
     fig, ax1 = plt.subplots()
-    ax1.set_xlabel('中心数/个')
+    ax1.set_xlabel('聚类个数k/个')
     ax1.set_ylabel('SSE')
     line1, = ax1.plot(range(1, 10), elbow, 'bo-')
     ax2 = ax1.twinx()  # 双坐标轴
