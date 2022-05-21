@@ -22,8 +22,6 @@ def read_csv(filename: str):
     columns = [x + '（' + y + '）' for x in pos for y in fac]
     df = pd.read_csv(filename + '.csv', header=0,
                      usecols=['月'] + columns)
-    df = pd.concat([df.iloc[:, 0], df.iloc[:, 1:5] * 625, df.iloc[:, 5:]],
-                   axis=1)
     return df[(df['月'] <= 3) + (df['月'] >= 11)].iloc[:, 1:]
 
 

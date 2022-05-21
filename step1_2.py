@@ -13,4 +13,5 @@ dirname = '/home/gjy/code/python3/myworks/resources/'
 filename = dirname + 'data.xlsx'
 df = pd.read_excel(filename, header=0, index_col=[0, 1],
                    usecols=['年', '月'] + columns)
+df.iloc[:, :4] = df.iloc[:, :4] * 625
 df.to_csv(dirname + 'data.csv')

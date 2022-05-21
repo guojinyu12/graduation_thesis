@@ -69,7 +69,6 @@ if __name__ == '__main__':
 
     mpl_font('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc')
     df = read_csv('/home/gjy/code/python3/myworks/resources/data')
-    df = pd.concat([df.iloc[:, :2], df.iloc[:, 2:] * 625], axis=1)
     年月 = df['年'].astype(str) + '-' + df['月'].astype(str)
     # 画图
     for e in columns:
