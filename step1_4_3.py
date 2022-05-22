@@ -9,7 +9,7 @@ pos = ['埃默里冰架',  '南极半岛', '毛德皇后地', '罗斯海']
 fac = ['气温', '融化像元个数', ]
 filename = '/home/gjy/code/python3/myworks/resources/data'
 """
-k均值聚类
+肘部法则
 """
 
 
@@ -21,6 +21,7 @@ def read_csv(filename: str):
     df = pd.read_csv(filename + '.csv', header=0, usecols=columns)
     t = [df[columns[i:i+2]] for i in range(0, len(columns), 2)]
     t = pd.concat(t, axis=1)
+    t = (t - t.min()) / (t.max() - t.min())
     return t.dropna()
 
 
