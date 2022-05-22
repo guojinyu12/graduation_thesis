@@ -43,17 +43,19 @@ def gct(name: str, x, maxlag):
     ft = round(t[0], 2)
     p = round(t[1], 4)
     print(f'{idx + 1} {ft:>5} p={p:.3}, F({int(t[2])},{int(t[3])})')
+    return f_value, p_value
 
+
+def draw(x, y1, y2):
     # 绘图
-    x = np.arange(1, maxlag + 1)
     fig, ax1 = plt.subplots()
     ax1.set_title(name)
     ax1.set_xlabel('范围')
     ax1.set_ylabel('统计量')
-    line1, = ax1.plot(x, f_value)
+    line1, = ax1.plot(x, y1)
     ax2 = ax1.twinx()  # 双坐标轴
     ax2.set_ylabel('p 值')
-    line2, = ax2.plot(x, p_value, '--')
+    line2, = ax2.plot(x, y2, '--')
     plt.legend([line1, line2], ['统计量', 'p 值'], loc='best', frameon=False)
     plt.savefig(name + 'gct.png')
 
@@ -62,9 +64,13 @@ if __name__ == '__main__':
     # font1 = '/home/gjy/.local/share/fonts/simfang.ttf' # 仿宋
     mpl_font('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc')
     ls = read_csv(filename)
+    maxlag = 7
+    x = np.arange(1, maxlag + 1)
     for name, data in zip(pos, ls):
-        gct(name + '1', data, 7)
+        y1, y2 = gct(name + '1', data, maxlag)
+        draw(x, y1, y2)
+
     for name, data in zip(pos, ls):
-        data = pd.concat([data.iloc[:, 1], data.iloc[:, 0]], axis=1)
-        gct(name + '2', data, 7)
+        y1, y2 = gct(name + '2', data.iloc[:, [1, 0]], 7)
+        draw(x, y1, y2)
     plt.show()
