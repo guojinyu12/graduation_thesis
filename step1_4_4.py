@@ -13,6 +13,7 @@ pos = ['埃默里冰架',  '南极半岛', '毛德皇后地', '罗斯海']
 fac = ['气温', '融化像元个数', ]
 columns = [x + '（' + y + '）' for x in pos for y in fac]
 filename = '/home/gjy/code/python3/myworks/resources/data'
+num = 3
 
 
 def read_csv(filename: str):
@@ -33,6 +34,7 @@ def draw(name: str, data: pd.DataFrame, color: np.ndarray):
     """
     显示图片
     """
+    plt.figure()  # 新图
     ax1 = plt.axes(projection='3d')
     ax1.set_title(name, y=-0.1)  # plt.title(name)，下同
     ax1.set_xlabel('年份')
@@ -41,6 +43,7 @@ def draw(name: str, data: pd.DataFrame, color: np.ndarray):
     # 创建这些样本的散点图
     ax1.scatter3D(data.iloc[:, 0], data.iloc[:, 1], data.iloc[:, 2],
                   c=color, s=10)
+    plt.savefig(f'chore/{name}月.png', bbox_inches='tight')
 
 
 def mpl_font(path: str):
@@ -51,14 +54,29 @@ def mpl_font(path: str):
     mpl.rcParams['font.family'] = fontfamily
 
 
-def get_color(table, length: int, label):
+def get_table(cls):
     """
-    转换表使得多个图形的相近分类颜色一致
+    转换表
     """
-    trans = [0] * length
+    return [e.name for e in cls]
+
+
+def get_color(table, label):
+    """
+    使得多个图形的相近分类颜色一致
+    """
+    table2 = [0] * len(table)
     for i, e in enumerate(table):
-        trans[e] = i
-    return np.fromiter((trans[e] for e in label), np.int32)
+        table2[e] = i
+    return np.fromiter((table2[e] for e in label), np.int32)
+
+
+def 每月点数(df, table: list):
+    grp = df.loc[:, ['月', 'label']].groupby('label')
+    cls = [grp.get_group(i) for i in range(num)]
+    cls = [e.groupby('月').count() for e in cls]
+    t = [cls[table[i]] for i in range(num)]
+    return pd.concat(t, axis=1)
 
 
 def all_work():
@@ -68,28 +86,22 @@ def all_work():
     ls1, ls2 = read_csv(filename)
     for name, df, df2 in zip(pos, ls1, ls2):
         # 聚类
-        model = KMeans(n_clusters=3, random_state=135)
+        model = KMeans(n_clusters=num, random_state=135)
         df['label'] = model.fit_predict(df2)
         # 聚类结果以最高温度递增的顺序排列
+        # 各个类别的平均气温和平均融化面积
         grp = df.iloc[:, 1:].groupby('label')
         cls = sorted((v for _, v in grp.mean().iterrows()),
                      key=lambda x: x.iat[0])
-        # 绘图
-        plt.figure()  # 新图
-        draw(name, df, get_color((e.name for e in cls), len(cls), df['label']))
-        plt.savefig(f'chore/{name}月.png', bbox_inches='tight')
-        # 分类
-        for i, e in enumerate(cls):
-            e.name = i
-        ls.append(pd.concat(cls, axis=1))
-        # 分类结果
-        grp = (df.loc[:, ['月', 'label']].groupby('label'))
-        cls = [grp.get_group(i) for i in range(model.n_clusters)]
-        t = [e.groupby('月').count() for e in cls]
-        t = pd.concat(t, axis=1)
-        # t = t.reindex(index=list(range(1, 13)))
-        t.name = name
+        t = pd.concat(cls, axis=1)
+        t.columns = np.arange(num)
         ls.append(t)
+        # 映射表
+        table = get_table(cls)
+        # 绘图
+        draw(name, df, get_color(table, df['label']))
+        # 分类结果
+        ls.append(每月点数(df, table))
     # 输出为CSV文件
     t = pd.concat(ls[::2])
     t = t.reindex(index=columns[::2] + columns[1::2])
@@ -98,6 +110,7 @@ def all_work():
     t.index = [[e1 for e1 in a for _ in pos],
                [e2 for e2 in pos] * len(a)]
     t.columns = b
+    print(t)
     t.to_csv('chore/月.csv')
     t = pd.concat(ls[1::2], axis=1)
     t = t.reindex(index=np.arange(1, 13))
