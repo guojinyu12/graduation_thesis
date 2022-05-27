@@ -16,3 +16,7 @@
 1.  setuptools
 2.  pkg-resources
 3.  wheel
+
+### 运行限制
+
+matplotlib需要字体才能显示中文，项目中字体路径硬编码在文件中需要修改
